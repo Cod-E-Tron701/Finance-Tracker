@@ -1,9 +1,8 @@
 package com.devops.finance_tracker;
 
-import com.devops.finance_tracker.Transaction;
-import com.devops.finance_tracker.Transaction_Repository;
 import org.springframework.stereotype.Service;
 import java.util.List;
+
 @Service
 public class Transaction_Service {
 
@@ -31,4 +30,9 @@ public class Transaction_Service {
     public double getBalance() {
         return getTotal("income") - getTotal("expense");
     }
+
+    public void clearAll() {
+        repository.deleteAll();
+    }
 }
+

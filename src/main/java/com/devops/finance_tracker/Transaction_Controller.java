@@ -1,8 +1,5 @@
 package com.devops.finance_tracker;
 
-import com.devops.finance_tracker.Summary;
-import com.devops.finance_tracker.Transaction;
-import com.devops.finance_tracker.Transaction_Service;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -33,4 +30,10 @@ public class Transaction_Controller {
         double balance = service.getBalance();
         return new Summary(income, expense, balance);
     }
+
+    @DeleteMapping
+    public void deleteAllTransactions() {
+        service.clearAll();
+    }
 }
+

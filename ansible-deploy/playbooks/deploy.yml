@@ -1,0 +1,32 @@
+---
+- name: Deploy Finance Tracker container
+  hosts: finance-host
+  become: true
+
+  tasks:
+    - name: Check if Docker is installed
+      command: which docker
+      register: docker_check
+      ignore_errors: yes
+
+    - name: Install Docker only if not present
+      shell: curl -fsSL https://get.docker.com | sh
+      when: docker_check.rc != 0
+
+    - name: Ensure Docker service is running
+      service:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Pull finance-tracker image from DockerHub
+      command: docker pull jerin07/finance-tracker:latest
+
+    - name: Stop existing finance-tracker container (if any)
+      shell: |
+        docker ps -q --filter "name=finance-tracker" | xargs -r docker stop
+        docker ps -aq --filter "name=finance-tracker" | xargs -r docker rm
+
+    - name: Run the finance-tracker container
+      command: docker run -d --name finance-tracker -p 9191:8080 jerin07/finance-tracker:latest
+
