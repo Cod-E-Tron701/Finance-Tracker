@@ -1,16 +1,6 @@
 import React from 'react';
 
 function TransactionList({ transactions, onClear }) {
-  const totalIncome = transactions
-    .filter((t) => t.type.toLowerCase() === 'income')
-    .reduce((sum, t) => sum + t.amount, 0);
-
-  const totalExpense = transactions
-    .filter((t) => t.type.toLowerCase() === 'expense')
-    .reduce((sum, t) => sum + t.amount, 0);
-
-  const balance = totalIncome - totalExpense;
-
   const handleClear = () => {
     if (window.confirm("Are you sure you want to delete all transactions?")) {
       fetch("http://localhost:9191/transactions", { method: "DELETE" })
@@ -30,22 +20,7 @@ function TransactionList({ transactions, onClear }) {
 
   return (
     <div className="p-4 bg-white rounded shadow">
-      <h2 className="text-xl font-semibold mb-2">Finance Summary</h2>
-
-      <div className="mb-4">
-        <p><strong>Balance:</strong> ₹{balance.toFixed(2)}</p>
-        <p><strong>Total Income:</strong> ₹{totalIncome.toFixed(2)}</p>
-        <p><strong>Total Expense:</strong> ₹{totalExpense.toFixed(2)}</p>
-      </div>
-
-      <button
-        onClick={handleClear}
-        className="mb-4 bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-      >
-        Clear All
-      </button>
-
-      <h3 className="text-lg font-medium mb-2">All Transactions</h3>
+      <h3 className="text-lg font-medium mb-4">All Transactions</h3>
 
       <div className="overflow-x-auto">
         <table className="w-full border border-gray-300 text-sm">
@@ -79,6 +54,13 @@ function TransactionList({ transactions, onClear }) {
           </tbody>
         </table>
       </div>
+
+      <button
+        onClick={handleClear}
+        className="mt-4 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+      >
+        Clear All
+      </button>
     </div>
   );
 }

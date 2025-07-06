@@ -1,5 +1,5 @@
 ---
-- name: Deploy Finance Tracker containers (Backend + Frontend)
+- name: Deploy Finance Tracker containers (Backend + Frontend + Monitoring)
   hosts: finance-host
   become: true
 
@@ -42,4 +42,26 @@
 
     - name: Run the frontend container
       command: docker run -d --name finance-frontend -p 3000:80 jerin07/finance-frontend:latest
+
+    # MONITORING
+    - name: Get current user
+      command: whoami
+      register: current_user
+
+    - name: Create monitoring directory
+      file:
+        path: /home/{{ current_user.stdout }}/monitoring
+        state: directory
+        mode: '0755'
+
+    - name: Copy monitoring content (docker-compose + provisioning)
+      copy:
+        src: files/monitoring/
+        dest: /home/{{ current_user.stdout }}/monitoring/
+        mode: '0755'
+
+    - name: Run monitoring containers (Grafana + Graphite)
+      shell: docker-compose up -d
+      args:
+        chdir: /home/{{ current_user.stdout }}/monitoring
 

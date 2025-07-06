@@ -1,0 +1,23 @@
+version: "3.3"
+services:
+  graphite:
+    image: graphiteapp/graphite-statsd
+    container_name: graphite
+    ports:
+      - "8081:80"
+      - "2003-2004:2003-2004"
+      - "2023-2024:2023-2024"
+      - "8125:8125/udp"
+      - "8126:8126"
+  
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - "3001:3000"
+    depends_on:
+      - graphite
+    volumes:
+      - ./monitoring/finance-dashboard.json:/etc/grafana/provisioning/dashboards/finance-dashboard.json
+      - ./monitoring/provisioning/dashboards/dashboard.yml:/etc/grafana/provisioning/dashboards/dashboard.yml
+
