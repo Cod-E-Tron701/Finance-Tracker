@@ -4,7 +4,7 @@ function AddTransaction({ onAdd, balance }) {
   const [formData, setFormData] = useState({
     category: '',
     amount: '',
-    type: 'Expense',
+    type: 'expense',
     date: ''
   });
 
@@ -17,7 +17,12 @@ function AddTransaction({ onAdd, balance }) {
     e.preventDefault();
     const amount = parseFloat(formData.amount);
 
-    if (formData.type === 'Expense' && amount > balance) {
+    if (!formData.amount || isNaN(amount)) {
+      alert("Please enter a valid amount.");
+      return;
+    }
+
+    if (formData.type === 'expense' && amount > balance) {
       alert("Insufficient balance for this expense.");
       return;
     }
@@ -30,45 +35,62 @@ function AddTransaction({ onAdd, balance }) {
       .then((res) => {
         if (res.ok) {
           alert("Transaction added!");
-          setFormData({ category: '', amount: '', type: 'Expense', date: '' });
-          onAdd(); // Refresh parent data
+          setFormData({ category: '', amount: '', type: 'expense', date: '' });
+          onAdd();
         } else {
-          alert("Failed to add transaction");
+          res.text().then(msg => alert("Failed to add transaction:\n" + msg));
         }
+      })
+      .catch((err) => {
+        alert("Error: " + err.message);
       });
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{ marginBottom: '20px' }}>
-      <h3>Add Transaction</h3>
-      <input
-        type="text"
-        name="category"
-        placeholder="Category"
-        value={formData.category}
-        onChange={handleChange}
-        required
-      />
-      <input
-        type="number"
-        name="amount"
-        placeholder="Amount"
-        value={formData.amount}
-        onChange={handleChange}
-        required
-      />
-      <select name="type" value={formData.type} onChange={handleChange}>
-        <option value="Income">Income</option>
-        <option value="Expense">Expense</option>
-      </select>
-      <input
-        type="date"
-        name="date"
-        value={formData.date}
-        onChange={handleChange}
-        required
-      />
-      <button type="submit">Add</button>
+    <form onSubmit={handleSubmit} className="mb-8 p-4 bg-white rounded shadow space-y-4">
+      <h3 className="text-xl font-semibold">Add Transaction</h3>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <input
+          type="text"
+          name="category"
+          placeholder="Category"
+          value={formData.category}
+          onChange={handleChange}
+          required
+          className="border p-2 rounded"
+        />
+        <input
+          type="number"
+          name="amount"
+          placeholder="Amount"
+          value={formData.amount}
+          onChange={handleChange}
+          required
+          className="border p-2 rounded"
+        />
+        <select
+          name="type"
+          value={formData.type}
+          onChange={handleChange}
+          className="border p-2 rounded"
+        >
+          <option value="Income">Income</option>
+          <option value="Expense">Expense</option>
+        </select>
+        <input
+          type="date"
+          name="date"
+          value={formData.date}
+          onChange={handleChange}
+          required
+          className="border p-2 rounded"
+        />
+      </div>
+
+      <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+        Add
+      </button>
     </form>
   );
 }

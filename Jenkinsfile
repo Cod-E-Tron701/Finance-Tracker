@@ -7,7 +7,8 @@ pipeline {
     }
 
     environment {
-        DOCKER_IMAGE = "finance-tracker:latest"
+        BACKEND_IMAGE = "jerin07/finance-tracker:latest"
+        FRONTEND_IMAGE = "jerin07/finance-frontend:latest"
     }
 
     stages {
@@ -17,7 +18,7 @@ pipeline {
             }
         }
 
-        stage('Build with Maven') {
+        stage('Build Backend') {
             steps {
                 sh 'mvn clean package'
             }
@@ -29,15 +30,41 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Build Backend Docker Image') {
             steps {
-                sh 'docker build -t $DOCKER_IMAGE .'
+                sh 'docker build -t $BACKEND_IMAGE .'
             }
         }
 
-        stage('Run Container') {
+        stage('Build Frontend Docker Image') {
             steps {
-                sh 'docker run -d -p 9191:8080 $DOCKER_IMAGE'
+                dir('frontend') {
+                    sh '''
+                        npm install
+                        npm run build
+                        docker build -t $FRONTEND_IMAGE .
+                    '''
+                }
+            }
+        }
+
+        stage('Stop Existing Containers') {
+            steps {
+                sh '''
+                    docker ps -q --filter "name=finance-tracker" | xargs -r docker stop
+                    docker ps -aq --filter "name=finance-tracker" | xargs -r docker rm
+                    docker ps -q --filter "name=finance-frontend" | xargs -r docker stop
+                    docker ps -aq --filter "name=finance-frontend" | xargs -r docker rm
+                '''
+            }
+        }
+
+        stage('Run Containers') {
+            steps {
+                sh '''
+                    docker run -d --name finance-tracker -p 9191:8080 $BACKEND_IMAGE
+                    docker run -d --name finance-frontend -p 3000:80 $FRONTEND_IMAGE
+                '''
             }
         }
     }

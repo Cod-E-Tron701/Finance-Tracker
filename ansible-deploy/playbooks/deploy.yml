@@ -1,5 +1,5 @@
 ---
-- name: Deploy Finance Tracker container
+- name: Deploy Finance Tracker containers (Backend + Frontend)
   hosts: finance-host
   become: true
 
@@ -19,14 +19,27 @@
         state: started
         enabled: true
 
-    - name: Pull finance-tracker image from DockerHub
+    # BACKEND
+    - name: Pull backend image from DockerHub
       command: docker pull jerin07/finance-tracker:latest
 
-    - name: Stop existing finance-tracker container (if any)
+    - name: Stop existing backend container (if any)
       shell: |
         docker ps -q --filter "name=finance-tracker" | xargs -r docker stop
         docker ps -aq --filter "name=finance-tracker" | xargs -r docker rm
 
-    - name: Run the finance-tracker container
+    - name: Run the backend container
       command: docker run -d --name finance-tracker -p 9191:8080 jerin07/finance-tracker:latest
+
+    # FRONTEND
+    - name: Pull frontend image from DockerHub
+      command: docker pull jerin07/finance-frontend:latest
+
+    - name: Stop existing frontend container (if any)
+      shell: |
+        docker ps -q --filter "name=finance-frontend" | xargs -r docker stop
+        docker ps -aq --filter "name=finance-frontend" | xargs -r docker rm
+
+    - name: Run the frontend container
+      command: docker run -d --name finance-frontend -p 3000:80 jerin07/finance-frontend:latest
 
