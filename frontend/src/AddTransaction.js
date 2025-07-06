@@ -75,8 +75,8 @@ function AddTransaction({ onAdd, balance }) {
           onChange={handleChange}
           className="border p-2 rounded"
         >
-          <option value="Income">Income</option>
-          <option value="Expense">Expense</option>
+          <option value="income">Income</option>
+          <option value="expense">Expense</option>
         </select>
         <input
           type="date"
