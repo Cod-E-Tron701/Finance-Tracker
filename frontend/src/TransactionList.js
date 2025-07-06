@@ -13,7 +13,7 @@ function TransactionList({ transactions, onClear }) {
 
   const handleClear = () => {
     if (window.confirm("Are you sure you want to delete all transactions?")) {
-      fetch("/transactions", { method: "DELETE" })
+      fetch("http://localhost:9191/transactions", { method: "DELETE" })
         .then((res) => {
           if (res.ok) {
             alert("All transactions cleared.");
